@@ -16,9 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progress->setValue(0);
     ui->status->setText("Téléchargement des métadonnées...");
     QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
-    //m_file = new FileDownloader(jsonUrl, this);
-    //connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
-    ZipDecompress zip("jre32.lzma", "java/");
+    m_file = new FileDownloader(jsonUrl, this);
+    connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
 }
 
 void MainWindow::loadJson()
