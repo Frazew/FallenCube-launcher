@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progress->setValue(0);
     ui->status->setText("Téléchargement des métadonnées...");
     QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
-    m_file = new FileDownloader(jsonUrl, this);
+    m_file = new FileDownloader(jsonUrl, new QFile("launcher.json"), false, this);
     connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
 }
 
@@ -24,7 +24,10 @@ void MainWindow::loadJson()
 {
      ui->progress->setValue(1);
      ui->status->setText("Analyse des fichiers à télécharger...");
-     QString strReply = (QString)m_file->downloadedData();
+     QFile launcher("launcher.json");
+     launcher.open(QIODevice::ReadOnly);
+     QString strReply = (QString)launcher.readAll();
+     launcher.close();
      QJsonDocument jsonResponse = QJsonDocument::fromJson(strReply.toUtf8());
      QJsonObject jsonObject = jsonResponse.object();
      QJsonObject windows = jsonObject["windows"].toObject();
@@ -34,33 +37,26 @@ void MainWindow::loadJson()
      jdk64 = new QUrl(windows["64"].toObject()["jdk"].toObject()["url"].toString());
      ui->progress->setValue(5);
      ui->status->setText("Téléchargement des fichiers... 1/2");
-     m_file = new FileDownloader(*jre32, this);
+     launcher.remove();
+     m_file = new FileDownloader(*jre32,new QFile("jre32.lzma"), true, this);
      connect(m_file, SIGNAL(update(qint64, qint64)), SLOT(updateProgressBar(qint64, qint64)));
      connect(m_file, SIGNAL(downloaded()), SLOT(saveLzma()));
 }
 
 void MainWindow::saveLzma()
 {
-    QFile file("jre32.lzma");
-    file.open(QIODevice::WriteOnly);
-    file.write(qUncompress(m_file->downloadedData()));
-    file.close();
     ZipDecompress zip("jre32.lzma", "java/");
-
     ui->progress->setValue(0);
     ui->status->setText("Téléchargement des fichiers... 2/2");
+    QFile::remove("jre32.lzma");
     QUrl launcherUrl("http://download.fallencube.fr/launcher/launcher.jar");
-    m_file = new FileDownloader(launcherUrl, this);
+    m_file = new FileDownloader(launcherUrl, new QFile("launcher.jar"), false, this);
     connect(m_file, SIGNAL(update(qint64, qint64)), SLOT(updateProgressBar(qint64, qint64)));
     connect(m_file, SIGNAL(downloaded()), SLOT(saveLauncher()));
 }
 
 void MainWindow::saveLauncher()
 {
-    QFile file("launcher.jar");
-    file.open(QIODevice::WriteOnly);
-    file.write(m_file->downloadedData());
-    file.close();
 }
 
 void MainWindow::updateProgressBar(qint64 bytesRead, qint64 totalBytes) {

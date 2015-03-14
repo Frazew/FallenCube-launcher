@@ -1,20 +1,35 @@
 #include "filedownloader.h"
+#include <QMessageBox>
 
-FileDownloader::FileDownloader(QUrl imageUrl, QObject *parent) :
+FileDownloader::FileDownloader(QUrl imageUrl, QFile *file, bool compress, QObject *parent) :
     QObject(parent)
 {
     httpRequestAborted = false;
+    shouldUncompress = compress;
+    destFile = file;
+
+    if (!destFile->open(QIODevice::WriteOnly)) {
+        delete destFile;
+        destFile = 0;
+        return;
+    }
+
     connect(&m_WebCtrl, SIGNAL(finished(QNetworkReply*)),
                 SLOT(fileDownloaded(QNetworkReply*)));
 
     QNetworkRequest request(imageUrl);
     reply = m_WebCtrl.get(request);
     connect(reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(updateDownloadProgress(qint64,qint64)));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(httpReadyRead()));
 }
 
 FileDownloader::~FileDownloader()
 {
 
+}
+
+void FileDownloader::httpReadyRead() {
+    if (destFile) destFile->write(reply->readAll());
 }
 
 void FileDownloader::updateDownloadProgress(qint64 bytesRead, qint64 totalBytes) {
@@ -25,7 +40,16 @@ void FileDownloader::updateDownloadProgress(qint64 bytesRead, qint64 totalBytes)
 void FileDownloader::fileDownloaded(QNetworkReply* pReply)
 {
     m_DownloadedData = pReply->readAll();
-    //emit a signal
+    destFile->flush();
+    if (destFile) destFile->close();
+    if (shouldUncompress) {
+        destFile->open(QIODevice::ReadOnly);
+        QByteArray source(destFile->readAll());
+        destFile->close();
+        destFile->open(QFile::ReadWrite | QIODevice::Truncate);
+        destFile->write(qUncompress(source));
+        destFile->close();
+    }
     pReply->deleteLater();
     emit downloaded();
 }

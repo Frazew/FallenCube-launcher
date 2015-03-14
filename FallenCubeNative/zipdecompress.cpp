@@ -15,10 +15,8 @@ ZipDecompress::ZipDecompress(char *filename, char *folder)
        mz_zip_archive_file_stat file_stat;
        if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat))
        {
-          printf("mz_zip_reader_file_stat() failed!\n");
           mz_zip_reader_end(&zip_archive);
        }
-       //char folderName[folder->length + file_stat.m_filename->length];
        char folderName[128];
        strcpy(folderName, extractTo);
        strcat(folderName, file_stat.m_filename);
@@ -28,19 +26,15 @@ ZipDecompress::ZipDecompress(char *filename, char *folder)
        else {
            mz_zip_reader_extract_file_to_file(&zip_archive, file_stat.m_filename, folderName, 0);
        }
-       printf("Filename: \"%s\", Comment: \"%s\", Is Dir: %u\n", folderName, file_stat.m_comment, mz_zip_reader_is_file_a_directory(&zip_archive, i));
 
        if (!strcmp(file_stat.m_filename, "directory/"))
        {
          if (!mz_zip_reader_is_file_a_directory(&zip_archive, i))
          {
-           printf("mz_zip_reader_is_file_a_directory() didn't return the expected results!\n");
            mz_zip_reader_end(&zip_archive);
          }
        }
      }
-
-     // Close the archive, freeing any resources it was using
      mz_zip_reader_end(&zip_archive);
 }
 
