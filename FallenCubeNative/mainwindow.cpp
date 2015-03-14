@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "filedownloader.h"
+#include "zipdecompress.h"
 #include <QFile>
 #include <QUrl>
 #include <QJsonDocument>
@@ -15,8 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progress->setValue(0);
     ui->status->setText("Téléchargement des métadonnées...");
     QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
-    m_file = new FileDownloader(jsonUrl, this);
-    connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
+    //m_file = new FileDownloader(jsonUrl, this);
+    //connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
+    ZipDecompress zip("jre32.lzma", "java/");
 }
 
 void MainWindow::loadJson()
@@ -44,6 +46,7 @@ void MainWindow::saveLzma()
     file.open(QIODevice::WriteOnly);
     file.write(qUncompress(m_file->downloadedData()));
     file.close();
+    ZipDecompress zip("jre32.lzma", "java/");
 
     ui->progress->setValue(0);
     ui->status->setText("Téléchargement des fichiers... 2/2");

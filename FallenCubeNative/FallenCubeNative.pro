@@ -15,7 +15,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    filedownloader.cpp
+    filedownloader.cpp \
+    zipdecompress.cpp \
+    miniz.cpp
 
 HEADERS  += mainwindow.h \
     json/autolink.h \
@@ -26,7 +28,8 @@ HEADERS  += mainwindow.h \
     json/reader.h \
     json/value.h \
     json/writer.h \
-    filedownloader.h
+    filedownloader.h \
+    zipdecompress.h
 
 FORMS    += mainwindow.ui
 
