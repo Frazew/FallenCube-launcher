@@ -64,7 +64,7 @@ void MainWindow::saveLzma()
 
 void MainWindow::saveLauncher()
 {
-    QString java = "./java/bin\\javaw.exe";
+    QString java = "./java/bin/javaw.exe";
     QStringList arguments;
     arguments << "-classpath" << "launcher.jar" << "net.fallencube.launcher.Launcher";
     QProcess *process = new QProcess(this);

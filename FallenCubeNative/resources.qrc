@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/root/window">
-        <file alias="favicon">C:/Users/franc_000/Downloads/favicon.ico</file>
+        <file alias="favicon">favicon.ico</file>
     </qresource>
 </RCC>
