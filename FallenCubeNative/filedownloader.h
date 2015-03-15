@@ -12,10 +12,7 @@ class FileDownloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit FileDownloader(QUrl imageUrl, QFile *file, bool compress, QObject *parent = 0);
-
-    virtual ~FileDownloader();
-
+    FileDownloader(QUrl imageUrl, QString file, bool compress, QObject *parent = 0);
     QByteArray downloadedData() const;
 
 signals:
@@ -30,7 +27,7 @@ private slots:
 
 private:
 
-    QNetworkAccessManager m_WebCtrl;
+    QNetworkAccessManager *m_WebCtrl;
     QNetworkReply *reply;
     QByteArray m_DownloadedData;
     qint64 fileSize;

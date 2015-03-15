@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QProcess>
 #include "filedownloader.h"
 
 namespace Ui {
@@ -19,17 +20,16 @@ public:
 private:
     FileDownloader *m_file;
     Ui::MainWindow *ui;
-    QUrl *jdk64;
-    QUrl *jdk32;
-    QUrl *jre64;
-    QUrl *jre32;
+    QUrl jdk64;
+    QUrl jdk32;
+    QUrl jre64;
+    QUrl jre32;
 
 private slots:
     void loadJson();
     void saveLzma();
     void saveLauncher();
     void updateProgressBar(qint64, qint64);
-    void exit();
 };
 
 #endif // MAINWINDOW_H

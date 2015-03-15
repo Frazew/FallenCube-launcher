@@ -1,31 +1,26 @@
 #include "filedownloader.h"
 #include <QMessageBox>
 
-FileDownloader::FileDownloader(QUrl imageUrl, QFile *file, bool compress, QObject *parent) :
+FileDownloader::FileDownloader(QUrl imageUrl, QString file, bool compress, QObject *parent) :
     QObject(parent)
 {
     httpRequestAborted = false;
     shouldUncompress = compress;
-    destFile = file;
+    destFile = new QFile(file);
 
     if (!destFile->open(QIODevice::WriteOnly)) {
         delete destFile;
         destFile = 0;
         return;
     }
-
-    connect(&m_WebCtrl, SIGNAL(finished(QNetworkReply*)),
+    m_WebCtrl = new QNetworkAccessManager(this);
+    connect(m_WebCtrl, SIGNAL(finished(QNetworkReply*)),
                 SLOT(fileDownloaded(QNetworkReply*)));
 
     QNetworkRequest request(imageUrl);
-    reply = m_WebCtrl.get(request);
+    reply = m_WebCtrl->get(request);
     connect(reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(updateDownloadProgress(qint64,qint64)));
     connect(reply, SIGNAL(readyRead()), this, SLOT(httpReadyRead()));
-}
-
-FileDownloader::~FileDownloader()
-{
-
 }
 
 void FileDownloader::httpReadyRead() {
@@ -52,9 +47,4 @@ void FileDownloader::fileDownloaded(QNetworkReply* pReply)
     }
     pReply->deleteLater();
     emit downloaded();
-}
-
-QByteArray FileDownloader::downloadedData() const
-{
-    return m_DownloadedData;
 }

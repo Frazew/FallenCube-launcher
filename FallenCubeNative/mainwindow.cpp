@@ -16,15 +16,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->progress->setValue(0);
+    jre32 = *new QUrl();
+    jdk32 = *new QUrl();
+    jre64 = *new QUrl();
+    jdk64 = *new QUrl();
     ui->status->setText("Téléchargement des métadonnées...");
     QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
-    m_file = new FileDownloader(jsonUrl, new QFile("launcher.json"), false, this);
+    m_file = new FileDownloader(jsonUrl, QString("launcher.json"), false, this);
     connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
-}
-
-void MainWindow::exit() {
-    this->close();
-    qApp->quit();
 }
 
 void MainWindow::loadJson()
@@ -38,14 +37,14 @@ void MainWindow::loadJson()
      QJsonDocument jsonResponse = QJsonDocument::fromJson(strReply.toUtf8());
      QJsonObject jsonObject = jsonResponse.object();
      QJsonObject windows = jsonObject["windows"].toObject();
-     jre32 = new QUrl(windows["32"].toObject()["jre"].toObject()["url"].toString());
-     jre64 = new QUrl(windows["64"].toObject()["jre"].toObject()["url"].toString());
-     jdk32 = new QUrl(windows["32"].toObject()["jdk"].toObject()["url"].toString());
-     jdk64 = new QUrl(windows["64"].toObject()["jdk"].toObject()["url"].toString());
+     jre32 = windows["32"].toObject()["jre"].toObject()["url"].toString();
+     jre64 = windows["64"].toObject()["jre"].toObject()["url"].toString();
+     jdk32 = windows["32"].toObject()["jdk"].toObject()["url"].toString();
+     jdk64 = windows["64"].toObject()["jdk"].toObject()["url"].toString();
      ui->progress->setValue(5);
      ui->status->setText("Téléchargement des fichiers... 1/2");
      launcher.remove();
-     m_file = new FileDownloader(*jre32,new QFile("jre32.lzma"), true, this);
+     m_file = new FileDownloader(jre32, QString("jre32.lzma"), true, this);
      connect(m_file, SIGNAL(update(qint64, qint64)), SLOT(updateProgressBar(qint64, qint64)));
      connect(m_file, SIGNAL(downloaded()), SLOT(saveLzma()));
 }
@@ -57,7 +56,7 @@ void MainWindow::saveLzma()
     ui->status->setText("Téléchargement des fichiers... 2/2");
     QFile::remove("jre32.lzma");
     QUrl launcherUrl("http://download.fallencube.fr/launcher/launcher.jar");
-    m_file = new FileDownloader(launcherUrl, new QFile("launcher.jar"), false, this);
+    m_file = new FileDownloader(launcherUrl, QString("launcher.jar"), false, this);
     connect(m_file, SIGNAL(update(qint64, qint64)), SLOT(updateProgressBar(qint64, qint64)));
     connect(m_file, SIGNAL(downloaded()), SLOT(saveLauncher()));
 }
@@ -67,9 +66,8 @@ void MainWindow::saveLauncher()
     QString java = "./java/bin/javaw.exe";
     QStringList arguments;
     arguments << "-classpath" << "launcher.jar" << "net.fallencube.launcher.Launcher";
-    QProcess *process = new QProcess(this);
-    connect(process, SIGNAL(started()), SLOT(exit()));
-    process->startDetached(java, arguments);
+    QProcess::startDetached(java, arguments);
+    close();
 }
 
 void MainWindow::updateProgressBar(qint64 bytesRead, qint64 totalBytes) {
