@@ -29,6 +29,7 @@ private slots:
     void saveLzma();
     void saveLauncher();
     void updateProgressBar(qint64, qint64);
+    void exit();
 };
 
 #endif // MAINWINDOW_H
