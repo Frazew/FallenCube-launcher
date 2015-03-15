@@ -18,14 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progress->setValue(0);
     ui->status->setText("Téléchargement des métadonnées...");
     QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
-    QString java = "./java/bin\\javaw.exe";
-    QStringList arguments;
-    arguments << "-classpath" << "launcher.jar" << "net.fallencube.launcher.Launcher";
-    QProcess *process = new QProcess(this);
-    connect(process, SIGNAL(started()), SLOT(exit()));
-    process->startDetached(java, arguments);
-    //m_file = new FileDownloader(jsonUrl, new QFile("launcher.json"), false, this);
-    //connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
+    m_file = new FileDownloader(jsonUrl, new QFile("launcher.json"), false, this);
+    connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
 }
 
 void MainWindow::exit() {
@@ -70,12 +64,12 @@ void MainWindow::saveLzma()
 
 void MainWindow::saveLauncher()
 {
-    QString java = "\\java\\bin\\javaw.exe";
+    QString java = "./java/bin\\javaw.exe";
     QStringList arguments;
-    arguments << "-jar" << "launcher.jar";
+    arguments << "-classpath" << "launcher.jar" << "net.fallencube.launcher.Launcher";
     QProcess *process = new QProcess(this);
-    process->start(java, arguments);
-    connect(process, SIGNAL(started()), SLOT(close()));
+    connect(process, SIGNAL(started()), SLOT(exit()));
+    process->startDetached(java, arguments);
 }
 
 void MainWindow::updateProgressBar(qint64 bytesRead, qint64 totalBytes) {
