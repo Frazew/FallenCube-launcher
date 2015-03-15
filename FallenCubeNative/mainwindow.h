@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QProcess>
 #include "filedownloader.h"
+#include "download.h"
 
 namespace Ui {
 class MainWindow;
@@ -15,6 +16,9 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    void downloadRequired();
+    void processDownloaded();
+    void launch();
     ~MainWindow();
 
 private:
@@ -24,11 +28,10 @@ private:
     QUrl jdk32;
     QUrl jre64;
     QUrl jre32;
+    QMap<QString, Download *> downloadlist;
 
 private slots:
     void loadJson();
-    void saveLzma();
-    void saveLauncher();
     void updateProgressBar(qint64, qint64);
 };
 

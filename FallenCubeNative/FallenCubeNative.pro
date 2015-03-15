@@ -17,7 +17,8 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     filedownloader.cpp \
     zipdecompress.cpp \
-    miniz.cpp
+    miniz.cpp \
+    download.cpp
 
 HEADERS  += mainwindow.h \
     json/autolink.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     json/value.h \
     json/writer.h \
     filedownloader.h \
-    zipdecompress.h
+    zipdecompress.h \
+    download.h
 
 FORMS    += mainwindow.ui
 

@@ -2,7 +2,7 @@
 #include "miniz.cpp"
 #include <QDir>
 
-ZipDecompress::ZipDecompress(char *filename, char *folder)
+ZipDecompress::ZipDecompress(char const *filename, char const *folder)
 {
     archiveName = filename;
     extractTo = folder;

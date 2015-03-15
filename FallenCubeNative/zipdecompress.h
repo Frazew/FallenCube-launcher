@@ -4,11 +4,11 @@
 class ZipDecompress
 {
 public:
-    ZipDecompress(char *filename, char *destname);
+    ZipDecompress(char const *filename, char const *destname);
     ~ZipDecompress();
 private:
-    char* archiveName;
-    char* extractTo;
+    char const * archiveName;
+    char const * extractTo;
     char data[2048];
     char uSize;
 };
