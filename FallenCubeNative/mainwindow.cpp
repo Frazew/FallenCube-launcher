@@ -17,12 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->progress->setValue(0);
 
-    jre32 = *new QUrl();
-    jdk32 = *new QUrl();
-    jre64 = *new QUrl();
-    jdk64 = *new QUrl();
-    downloadlist = *new QMap<QString, Download *>;
-
     ui->status->setText("Téléchargement des métadonnées...");
     QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
     m_file = new FileDownloader(jsonUrl, QString("launcher.json"), false, this);
@@ -42,30 +36,30 @@ void MainWindow::loadJson()
      QJsonObject jsonObject = jsonResponse.object();
      QJsonObject windows = jsonObject["windows"].toObject();
 
-     jre32 = windows["32"].toObject()["jre"].toObject()["url"].toString();
-     jre64 = windows["64"].toObject()["jre"].toObject()["url"].toString();
-     jdk32 = windows["32"].toObject()["jdk"].toObject()["url"].toString();
-     jdk64 = windows["64"].toObject()["jdk"].toObject()["url"].toString();
+     m_jre32 = windows["32"].toObject()["jre"].toObject()["url"].toString();
+     m_jre64 = windows["64"].toObject()["jre"].toObject()["url"].toString();
+     m_jdk32 = windows["32"].toObject()["jdk"].toObject()["url"].toString();
+     m_jdk64 = windows["64"].toObject()["jdk"].toObject()["url"].toString();
 
      launcher.remove();
      QUrl launcherUrl("http://download.fallencube.fr/launcher/launcher.jar");
 
-     downloadlist.insert("Java", new Download(jre32, "jre32.lzma", true, this));
-     downloadlist.insert("Launcher", new Download(launcherUrl, "launcher.jar", false, this));
+     m_downloadlist.insert("Java", *new Download(m_jre32, "jre32.lzma", true));
+     m_downloadlist.insert("Launcher", *new Download(launcherUrl, "launcher.jar", false));
      downloadRequired();
 }
 
 void MainWindow::downloadRequired() {
 
-    QMapIterator<QString, Download *> iter(downloadlist);
+    QMapIterator<QString, Download> iter(m_downloadlist);
     QString status("Téléchargement des fichiers... %1/%2");
     QEventLoop loop;
     int count = 0;
     while(iter.hasNext()) {
         iter.next();
         count++;
-        ui->status->setText(status.arg(QString::number(count), QString::number(downloadlist.size())));
-        m_file = new FileDownloader(iter.value()->getUrl(), iter.value()->getName(), iter.value()->isCompressed(), this);
+        ui->status->setText(status.arg(QString::number(count), QString::number(m_downloadlist.size())));
+        m_file = new FileDownloader(iter.value().getUrl(), iter.value().getName(), iter.value().isCompressed(), this);
         connect(m_file, SIGNAL(update(qint64, qint64)), SLOT(updateProgressBar(qint64, qint64)));
         connect(m_file, SIGNAL(downloaded()), &loop, SLOT(quit()));
         loop.exec();

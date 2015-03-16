@@ -28,12 +28,11 @@ private slots:
 private:
 
     QNetworkAccessManager *m_WebCtrl;
-    QNetworkReply *reply;
+    QNetworkReply *m_reply;
     QByteArray m_DownloadedData;
-    qint64 fileSize;
-    QFile *destFile;
-    bool httpRequestAborted;
-    bool shouldUncompress;
+    QFile *m_destFile;
+    bool m_httpRequestAborted;
+    bool m_shouldUncompress;
 
 };
 

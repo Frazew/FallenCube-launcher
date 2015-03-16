@@ -24,11 +24,11 @@ public:
 private:
     FileDownloader *m_file;
     Ui::MainWindow *ui;
-    QUrl jdk64;
-    QUrl jdk32;
-    QUrl jre64;
-    QUrl jre32;
-    QMap<QString, Download *> downloadlist;
+    QUrl m_jdk64;
+    QUrl m_jdk32;
+    QUrl m_jre64;
+    QUrl m_jre32;
+    QMap<QString, Download> m_downloadlist;
 
 private slots:
     void loadJson();
