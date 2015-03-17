@@ -19,6 +19,7 @@ public:
     void downloadRequired();
     void processDownloaded();
     void launch();
+    void begin();
     ~MainWindow();
 
 private:

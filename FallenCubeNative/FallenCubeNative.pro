@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = FallenCubeNative
 TEMPLATE = app
-
+RC_FILE = fallencubenative.rc
 
 SOURCES += main.cpp\
         mainwindow.cpp \

@@ -16,11 +16,24 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->progress->setValue(0);
+    begin();
+}
 
-    ui->status->setText("Téléchargement des métadonnées...");
-    QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
-    m_file = new FileDownloader(jsonUrl, QString("launcher.json"), false, this);
-    connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
+void MainWindow::begin() {
+    QFileInfo javaFile("java/");
+    QFileInfo launcherFile("launcher.jar");
+    bool java(javaFile.exists());
+    bool launcher(launcherFile.exists());
+    if (!java || !launcher) {
+        ui->status->setText("Téléchargement des métadonnées...");
+        QUrl jsonUrl("http://download.fallencube.fr/launcher/launcher.json");
+        m_file = new FileDownloader(jsonUrl, QString("launcher.json"), false, this);
+        connect(m_file, SIGNAL(downloaded()), SLOT(loadJson()));
+    } else {
+        ui->status->setText("Prêt !");
+        ui->progress->setValue(100);
+        launch();
+    }
 }
 
 void MainWindow::loadJson()
